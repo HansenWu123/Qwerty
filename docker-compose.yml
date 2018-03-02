@@ -1,0 +1,59 @@
+# Help: rename the adject docker-compose.override.example.yml file to docker-compose.override.yml
+#       then in the override file uncomment the environment tag for the collectors you want to
+#       run. Then add the environment vars you want to use.
+version: '3'
+services:
+  db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - "db-data:/data/db"
+
+  db-setup:
+    build: db
+    depends_on:
+      - db
+
+  api:
+    image: hygieia-api
+    #image: jimmylin-api
+    depends_on:
+      - db-setup
+    ports:
+      - "8080:8080"
+
+  ui:
+    image: hygieia-ui
+    depends_on:
+      - api
+    ports:
+      - "3000:80"
+
+  github-collector:
+    image: hygieia-github-scm-collector
+    depends_on:
+      - db-setup
+
+  # jenkins-build-collector:
+    # image: hygieia-jenkins-build-collector
+    # depends_on:
+      # - db-setup
+
+  # jira-collector:
+    # image: hygieia-jira-feature-collector
+    # depends_on:
+      # - db-setup
+
+  # sonar-codequality-collector:
+    # image: hygieia-sonar-codequality-collector
+    # depends_on:
+      # - db-setup
+
+  # subversion-collector:
+    # image: hygieia-subversion-scm-collector
+    # depends_on:
+      # - db-setup
+
+volumes:
+  db-data:
